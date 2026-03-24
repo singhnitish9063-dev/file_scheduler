@@ -1,0 +1,44 @@
+name: KPI Daily Automation
+
+on:
+  schedule:
+    # Runs every day at 13:15 IST (07:45 UTC)
+    - cron: '45 7 * * *'
+  workflow_dispatch:  # manual trigger
+
+jobs:
+  run-kpi-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # 3. Install dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install pandas openpyxl xlsxwriter
+          fi
+
+      # 4. Run your script
+      - name: Run KPI Script
+        run: |
+          python new_file_code.py
+
+      # 5. Upload output file
+      - name: Upload Output File
+        uses: actions/upload-artifact@v4
+        with:
+          name: KPI_Report
+          path: KPI_report_HLR_HSS.xlsx
